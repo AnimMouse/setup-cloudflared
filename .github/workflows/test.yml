@@ -1,0 +1,25 @@
+name: Test setup-cloudflared
+on:
+  push:
+    paths:
+      - action.yml
+      - shutdown/action.yml
+      - .github/workflows/test.yml
+      
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Setup cloudflared using setup-cloudflared
+        uses: AnimMouse/setup-cloudflared@main
+        with:
+          cloudflare_tunnel_certificate: ${{ secrets.CLOUDFLARE_TUNNEL_CERTIFICATE }}
+          cloudflare_tunnel_credential: ${{ secrets.CLOUDFLARE_TUNNEL_CREDENTIAL }}
+          cloudflare_tunnel_configuration: ${{ secrets.CLOUDFLARE_TUNNEL_CONFIGURATION }}
+          cloudflare_tunnel_id: ${{ secrets.CLOUDFLARE_TUNNEL_ID }}
+          
+      - name: Test setup-cloudflared installed by setup-cloudflared using Python HTTP server
+        run: timeout 5m python -m http.server 8000 || true
+        
+      - name: Shutdown cloudflared using setup-cloudflared/shutdown
+        uses: AnimMouse/setup-cloudflared/shutdown@main

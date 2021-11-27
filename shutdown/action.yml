@@ -1,0 +1,20 @@
+name: Shutdown Cloudflare Tunnel
+description: Shutdown Cloudflare Tunnel installed by setup-cloudflared
+branding:
+  icon: cloud-off
+  color: orange
+  
+runs:
+  using: composite
+  steps:
+    - name: Shutdown Cloudflare Tunnel
+      shell: bash
+      working-directory: ${{ runner.temp }}
+      run: |
+        kill $(cat cloudflared.pid)
+        tail --pid=$(cat cloudflared.pid) -f /dev/null
+        
+    - name: View logs of Cloudflare Tunnel
+      shell: bash
+      working-directory: ${{ runner.temp }}
+      run: cat cloudflared.log

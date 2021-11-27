@@ -1,0 +1,52 @@
+name: Setup cloudflared
+description: Setup/Install Cloudflare Tunnel client for GitHub Actions
+branding:
+  icon: cloud
+  color: orange
+inputs:
+  cloudflare_tunnel_certificate:
+    description: Cloudflare Tunnel Certificate (cert.pem)
+    required: true
+  cloudflare_tunnel_credential:
+    description: Cloudflare Tunnel Credential encoded in base64 (deadbeef-1234-4321-abcd-123456789ab.json)
+    required: true
+  cloudflare_tunnel_configuration:
+    description: Cloudflare Tunnel Configuration encoded in base64 (config.yml)
+    required: true
+  cloudflare_tunnel_id:
+    description: Cloudflare Tunnel ID (deadbeef-1234-4321-abcd-123456789ab)
+    required: true
+    
+runs:
+  using: composite
+  steps:
+    - name: Download cloudflared for Linux
+      shell: bash
+      working-directory: ${{ runner.temp }}
+      run: aria2c -x 16 "https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-amd64"
+      
+    - name: Install cloudflared
+      shell: bash
+      working-directory: ${{ runner.temp }}
+      run: |
+        chmod +x cloudflared-linux-amd64
+        mv cloudflared-linux-amd64 /usr/local/bin/cloudflared
+        
+    - name: Login to Cloudflare Tunnel client
+      shell: bash
+      env:
+        cloudflare_tunnel_certificate: ${{ inputs.cloudflare_tunnel_certificate }}
+        cloudflare_tunnel_credential: ${{ inputs.cloudflare_tunnel_credential }}
+        cloudflare_tunnel_configuration: ${{ inputs.cloudflare_tunnel_configuration }}
+        cloudflare_tunnel_id: ${{ inputs.cloudflare_tunnel_id }}
+      run: |
+        mkdir ~/.cloudflared/
+        echo $cloudflare_tunnel_certificate > ~/.cloudflared/cert.pem
+        echo $cloudflare_tunnel_credential | base64 -d > ~/.cloudflared/${cloudflare_tunnel_id}.json
+        echo $cloudflare_tunnel_configuration | base64 -d > ~/.cloudflared/config.yml
+        
+    - name: Run Cloudflare Tunnel
+      shell: bash
+      run: |
+        nohup cloudflared tunnel run setup-cloudflared-test > ${{ runner.temp }}/cloudflared.log 2>&1 &
+        echo $! > ${{ runner.temp }}/cloudflared.pid
