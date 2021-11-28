@@ -16,9 +16,6 @@ inputs:
   cloudflare_tunnel_id:
     description: Cloudflare Tunnel ID (deadbeef-1234-4321-abcd-123456789ab)
     required: true
-  cloudflare_tunnel_name:
-    description: Cloudflare Tunnel Name
-    required: true
   autostart:
     description: Autostart Cloudflare Tunnel
     required: false
@@ -55,6 +52,8 @@ runs:
     - name: Run Cloudflare Tunnel
       if: inputs.autostart == 'true'
       shell: bash
+      env:
+        cloudflare_tunnel_id: ${{ inputs.cloudflare_tunnel_id }}
       run: |
-        nohup cloudflared tunnel run "${{ inputs.cloudflare_tunnel_name }}" > ${{ runner.temp }}/cloudflared.log 2>&1 &
+        nohup cloudflared tunnel run $cloudflare_tunnel_id > ${{ runner.temp }}/cloudflared.log 2>&1 &
         echo $! > ${{ runner.temp }}/cloudflared.pid
