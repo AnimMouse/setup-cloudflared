@@ -47,5 +47,5 @@ steps:
       autostart: false
       
     - name: Manually start Cloudflare Tunnel
-      run: timeout 5m cloudflared tunnel run tunnel-name || true
+      run: timeout 5m cloudflared tunnel run || true
 ```
