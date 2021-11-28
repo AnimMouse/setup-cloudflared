@@ -7,24 +7,20 @@ inputs:
   cloudflare_tunnel_certificate:
     description: Cloudflare Tunnel Certificate (cert.pem)
     required: true
-    default: ${{ secrets.CLOUDFLARE_TUNNEL_CERTIFICATE }}
   cloudflare_tunnel_credential:
     description: Cloudflare Tunnel Credential encoded in base64 (deadbeef-1234-4321-abcd-123456789ab.json)
     required: true
-    default: ${{ secrets.CLOUDFLARE_TUNNEL_CREDENTIAL }}
   cloudflare_tunnel_configuration:
     description: Cloudflare Tunnel Configuration encoded in base64 (config.yml)
     required: true
-    default: ${{ secrets.CLOUDFLARE_TUNNEL_CONFIGURATION }}
   cloudflare_tunnel_id:
     description: Cloudflare Tunnel ID (deadbeef-1234-4321-abcd-123456789ab)
     required: true
-    default: ${{ secrets.CLOUDFLARE_TUNNEL_ID }}
   cloudflare_tunnel_name:
     description: Cloudflare Tunnel Name
     required: true
-  auto-start:
-    description: Auto-start Cloudflare Tunnel
+  autostart:
+    description: Autostart Cloudflare Tunnel
     required: false
     default: true
     

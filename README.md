@@ -19,23 +19,6 @@ steps:
   - name: Setup Cloudflare Tunnel
     uses: AnimMouse/setup-cloudflared@v1
     with:
-      cloudflare_tunnel_name: tunnel-name
-      
-    - name: Start Python HTTP server
-      run: timeout 5m python -m http.server 8000 || true
-      
-    - name: Shutdown and view logs of Cloudflare Tunnel
-      if: always()
-      uses: AnimMouse/setup-cloudflared/shutdown@v1
-```
-
-You can also use the `with:` key to specify what secret to use other than the default.
-
-```yml
-steps:
-  - name: Setup Cloudflare Tunnel
-    uses: AnimMouse/setup-cloudflared@v1
-    with:
       cloudflare_tunnel_certificate: ${{ secrets.CLOUDFLARE_TUNNEL_CERTIFICATE }}
       cloudflare_tunnel_credential: ${{ secrets.CLOUDFLARE_TUNNEL_CREDENTIAL }}
       cloudflare_tunnel_configuration: ${{ secrets.CLOUDFLARE_TUNNEL_CONFIGURATION }}
@@ -50,7 +33,7 @@ steps:
       uses: AnimMouse/setup-cloudflared/shutdown@v1
 ```
 
-If you don't want to auto-start Cloudflare Tunnel, set `auto-start:` to `false`.
+If you don't want to autostart Cloudflare Tunnel, set `autostart:` to `false`.
 
 ```yml
 steps:
@@ -58,7 +41,7 @@ steps:
     uses: AnimMouse/setup-cloudflared@v1
     with:
       cloudflare_tunnel_name: tunnel-name
-      auto-start: false
+      autostart: false
       
     - name: Manually start Cloudflare Tunnel
       run: timeout 5m cloudflared tunnel run tunnel-name || true
