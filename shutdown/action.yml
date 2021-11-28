@@ -1,4 +1,4 @@
-name: Shutdown Cloudflare Tunnel
+name: Shutdown cloudflared
 description: Shutdown Cloudflare Tunnel installed by setup-cloudflared
 branding:
   icon: cloud-off

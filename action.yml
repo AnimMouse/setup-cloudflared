@@ -7,15 +7,26 @@ inputs:
   cloudflare_tunnel_certificate:
     description: Cloudflare Tunnel Certificate (cert.pem)
     required: true
+    default: ${{ secrets.CLOUDFLARE_TUNNEL_CERTIFICATE }}
   cloudflare_tunnel_credential:
     description: Cloudflare Tunnel Credential encoded in base64 (deadbeef-1234-4321-abcd-123456789ab.json)
     required: true
+    default: ${{ secrets.CLOUDFLARE_TUNNEL_CREDENTIAL }}
   cloudflare_tunnel_configuration:
     description: Cloudflare Tunnel Configuration encoded in base64 (config.yml)
     required: true
+    default: ${{ secrets.CLOUDFLARE_TUNNEL_CONFIGURATION }}
   cloudflare_tunnel_id:
     description: Cloudflare Tunnel ID (deadbeef-1234-4321-abcd-123456789ab)
     required: true
+    default: ${{ secrets.CLOUDFLARE_TUNNEL_ID }}
+  cloudflare_tunnel_name:
+    description: Cloudflare Tunnel Name
+    required: true
+  auto-start:
+    description: Auto-start Cloudflare Tunnel
+    required: false
+    default: true
     
 runs:
   using: composite
@@ -46,7 +57,8 @@ runs:
         echo $cloudflare_tunnel_configuration | base64 -d > ~/.cloudflared/config.yml
         
     - name: Run Cloudflare Tunnel
+      if: inputs.autostart == 'true'
       shell: bash
       run: |
-        nohup cloudflared tunnel run setup-cloudflared-test > ${{ runner.temp }}/cloudflared.log 2>&1 &
+        nohup cloudflared tunnel run "${{ inputs.cloudflare_tunnel_name }}" > ${{ runner.temp }}/cloudflared.log 2>&1 &
         echo $! > ${{ runner.temp }}/cloudflared.pid
