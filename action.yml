@@ -55,5 +55,5 @@ runs:
       env:
         cloudflare_tunnel_id: ${{ inputs.cloudflare_tunnel_id }}
       run: |
-        nohup cloudflared tunnel run > ${{ runner.temp }}/cloudflared.log 2>&1 &
-        echo $! > ${{ runner.temp }}/cloudflared.pid
+        nohup cloudflared tunnel run > ${RUNNER_TEMP}/cloudflared.log 2>&1 &
+        echo $! > ${RUNNER_TEMP}/cloudflared.pid
