@@ -1,5 +1,5 @@
 name: Shutdown cloudflared
-description: Shutdown Cloudflare Tunnel installed by setup-cloudflared
+description: Shutdown Cloudflare Tunnel autostarted by setup-cloudflared
 branding:
   icon: cloud-off
   color: orange

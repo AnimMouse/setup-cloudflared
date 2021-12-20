@@ -11,13 +11,13 @@ inputs:
     description: Cloudflare Tunnel Credential encoded in base64 (deadbeef-1234-4321-abcd-123456789ab.json)
     required: true
   cloudflare_tunnel_configuration:
-    description: Cloudflare Tunnel Configuration encoded in base64 (config.yml)
+    description: Cloudflare Tunnel Configuration encoded in base64 (config.yaml)
     required: true
   cloudflare_tunnel_id:
     description: Cloudflare Tunnel ID (deadbeef-1234-4321-abcd-123456789ab)
     required: true
   autostart:
-    description: Autostart Cloudflare Tunnel
+    description: Autostart Cloudflare Tunnel in the background
     required: false
     default: true
     
@@ -27,33 +27,23 @@ runs:
     - name: Download cloudflared for Linux
       shell: bash
       working-directory: ${{ runner.temp }}
-      run: aria2c -x 16 "https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-amd64"
+      run: $GITHUB_ACTION_PATH/scripts/download/Linux.sh
       
-    - name: Install cloudflared
-      shell: bash
-      working-directory: ${{ runner.temp }}
-      run: |
-        chmod +x cloudflared-linux-amd64
-        mv cloudflared-linux-amd64 /usr/local/bin/cloudflared
+    - name: Install cloudflared on tool cache
+      uses: AnimMouse/tool-cache@v1
+      with:
+        folder_name: cloudflared
         
-    - name: Login to Cloudflare Tunnel client
+    - name: Sign in to Cloudflare Tunnel client
       shell: bash
       env:
         cloudflare_tunnel_certificate: ${{ inputs.cloudflare_tunnel_certificate }}
         cloudflare_tunnel_credential: ${{ inputs.cloudflare_tunnel_credential }}
         cloudflare_tunnel_configuration: ${{ inputs.cloudflare_tunnel_configuration }}
         cloudflare_tunnel_id: ${{ inputs.cloudflare_tunnel_id }}
-      run: |
-        mkdir ~/.cloudflared/
-        echo $cloudflare_tunnel_certificate > ~/.cloudflared/cert.pem
-        echo $cloudflare_tunnel_credential | base64 -d > ~/.cloudflared/${cloudflare_tunnel_id}.json
-        echo $cloudflare_tunnel_configuration | base64 -d > ~/.cloudflared/config.yml
-        
-    - name: Run Cloudflare Tunnel
-      if: inputs.autostart == 'true'
+      run: $GITHUB_ACTION_PATH/scripts/sign-in/Unix-like.sh
+      
+    - name: Start Cloudflare Tunnel in the background
+      if: inputs.autostart != 'false'
       shell: bash
-      env:
-        cloudflare_tunnel_id: ${{ inputs.cloudflare_tunnel_id }}
-      run: |
-        nohup cloudflared tunnel run > ${RUNNER_TEMP}/cloudflared.log 2>&1 &
-        echo $! > ${RUNNER_TEMP}/cloudflared.pid
+      run: $GITHUB_ACTION_PATH/scripts/autostart/Linux.sh

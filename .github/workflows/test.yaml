@@ -2,9 +2,10 @@ name: Test setup-cloudflared
 on:
   push:
     paths:
-      - action.yml
-      - shutdown/action.yml
-      - .github/workflows/test.yml
+      - action.yaml
+      - scripts/**
+      - shutdown/action.yaml
+      - .github/workflows/test.yaml
       
 jobs:
   test:
@@ -18,8 +19,8 @@ jobs:
           cloudflare_tunnel_configuration: ${{ secrets.CLOUDFLARE_TUNNEL_CONFIGURATION }}
           cloudflare_tunnel_id: ${{ secrets.CLOUDFLARE_TUNNEL_ID }}
           
-      - name: Test cloudflared installed by setup-cloudflared using Python HTTP server for 5 minutes
-        run: timeout 5m python -m http.server 8000 || true
+      - name: Test cloudflared installed by setup-cloudflared using Python HTTP server for 1 minute
+        run: timeout 1m python -m http.server 8000 || true
         
       - name: Shutdown cloudflared using setup-cloudflared/shutdown
         if: always()
