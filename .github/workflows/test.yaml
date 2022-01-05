@@ -2,9 +2,9 @@ name: Test setup-cloudflared
 on:
   push:
     paths:
-      - action.yaml
+      - action.yml
       - scripts/**
-      - shutdown/action.yaml
+      - shutdown/action.yml
       - .github/workflows/test.yaml
       
 jobs:

@@ -7,7 +7,7 @@ This action will automatically sign in and start Cloudflare Tunnel.
 
 Other virtual environments besides Ubuntu are not supported yet.
 
-[Test page for setup-cloudflared](https://setup-cloudflared-test.114913.xyz/)
+[Test page for setup-cloudflared](https://setup-cloudflared-test.0000004.xyz)
 
 ## Usage
 1. Paste the contents of the cert.prm file to `CLOUDFLARE_TUNNEL_CERTIFICATE` secret. No need to encode it to base64 as it is already in base64.
@@ -53,3 +53,8 @@ steps:
     - name: Manually start Cloudflare Tunnel
       run: timeout 5m cloudflared tunnel run || true
 ```
+
+### Similar actions
+1. [vmactions/cf-tunnel](https://github.com/vmactions/cf-tunnel)
+2. [apogiatzis/ngrok-tunneling-action](https://github.com/apogiatzis/ngrok-tunneling-action)
+3. [vmactions/ngrok-tunnel](https://github.com/vmactions/ngrok-tunnel)
