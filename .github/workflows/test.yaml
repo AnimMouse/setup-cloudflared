@@ -14,13 +14,12 @@ jobs:
       - name: Setup cloudflared using setup-cloudflared
         uses: AnimMouse/setup-cloudflared@main
         with:
-          cloudflare_tunnel_certificate: ${{ secrets.CLOUDFLARE_TUNNEL_CERTIFICATE }}
           cloudflare_tunnel_credential: ${{ secrets.CLOUDFLARE_TUNNEL_CREDENTIAL }}
           cloudflare_tunnel_configuration: ${{ secrets.CLOUDFLARE_TUNNEL_CONFIGURATION }}
           cloudflare_tunnel_id: ${{ secrets.CLOUDFLARE_TUNNEL_ID }}
           
       - name: Test cloudflared installed by setup-cloudflared using Python HTTP server for 1 minute
-        run: timeout 1m python -m http.server 8000 || true
+        run: timeout 1m python -m http.server 8080 || true
         
       - name: Shutdown cloudflared using setup-cloudflared/shutdown
         if: always()

@@ -4,17 +4,14 @@ branding:
   icon: cloud
   color: orange
 inputs:
-  cloudflare_tunnel_certificate:
-    description: Cloudflare Tunnel Certificate (cert.pem)
-    required: true
   cloudflare_tunnel_credential:
-    description: Cloudflare Tunnel Credential encoded in base64 (deadbeef-1234-4321-abcd-123456789ab.json)
+    description: Cloudflare Tunnel Credential encoded in base64 (deadbeef-1234-4321-abcd-123456789abc.json)
     required: true
   cloudflare_tunnel_configuration:
     description: Cloudflare Tunnel Configuration encoded in base64 (config.yaml)
     required: true
   cloudflare_tunnel_id:
-    description: Cloudflare Tunnel ID (deadbeef-1234-4321-abcd-123456789ab)
+    description: Cloudflare Tunnel ID (deadbeef-1234-4321-abcd-123456789abc)
     required: true
   autostart:
     description: Autostart Cloudflare Tunnel in the background
@@ -37,7 +34,6 @@ runs:
     - name: Sign in to Cloudflare Tunnel client
       shell: bash
       env:
-        cloudflare_tunnel_certificate: ${{ inputs.cloudflare_tunnel_certificate }}
         cloudflare_tunnel_credential: ${{ inputs.cloudflare_tunnel_credential }}
         cloudflare_tunnel_configuration: ${{ inputs.cloudflare_tunnel_configuration }}
         cloudflare_tunnel_id: ${{ inputs.cloudflare_tunnel_id }}
