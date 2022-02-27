@@ -11,8 +11,8 @@ Other virtual environments besides Ubuntu are not supported yet.
 
 ## Usage
 1. Encode the JSON credential in base64 using this command `base64 -w 0 <cloudflare-tunnel-id>.json` and paste it to `CLOUDFLARE_TUNNEL_CREDENTIAL` secret.
-2. At the config.yml, set `credentials-file:` to `/home/runner/.cloudflared/<cloudflare-tunnel-id>.json`
-3. Encode the config.yml in base64 using this command `base64 -w 0 config.yml` and paste it to `CLOUDFLARE_TUNNEL_CONFIGURATION` secret.
+2. At the config.yaml, set `credentials-file:` to `/home/runner/.cloudflared/<cloudflare-tunnel-id>.json`
+3. Encode the config.yaml in base64 using this command `base64 -w 0 config.yaml` and paste it to `CLOUDFLARE_TUNNEL_CONFIGURATION` secret.
 4. Add the Cloudflare Tunnel ID to `CLOUDFLARE_TUNNEL_ID` secret.
 
 To gracefully shutdown Cloudflare Tunnel after being started in the background, use the `AnimMouse/setup-cloudflared/shutdown` action as composite actions does not support `post:` yet.\
