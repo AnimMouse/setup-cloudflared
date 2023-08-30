@@ -6,21 +6,82 @@ on:
       - scripts/**
       - shutdown/action.yml
       - .github/workflows/test.yaml
+  pull_request:
+    paths:
+      - action.yml
+      - scripts/**
+      - shutdown/action.yml
+      - .github/workflows/test.yaml
       
 jobs:
-  test:
+  test-ubuntu:
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        version: [latest, 2023.8.1]
+        
     steps:
       - name: Setup cloudflared using setup-cloudflared
         uses: AnimMouse/setup-cloudflared@main
         with:
           cloudflare_tunnel_credential: ${{ secrets.CLOUDFLARE_TUNNEL_CREDENTIAL }}
-          cloudflare_tunnel_configuration: ${{ secrets.CLOUDFLARE_TUNNEL_CONFIGURATION }}
+          cloudflare_tunnel_configuration: ${{ secrets.CLOUDFLARE_TUNNEL_CONFIGURATION_UBUNTU }}
           cloudflare_tunnel_id: ${{ secrets.CLOUDFLARE_TUNNEL_ID }}
           
       - name: Test cloudflared installed by setup-cloudflared using Python HTTP server for 1 minute
         run: timeout 1m python -m http.server 8080 || true
         
+      - name: Shutdown cloudflared using setup-cloudflared/shutdown
+        if: always()
+        uses: AnimMouse/setup-cloudflared/shutdown@main
+        
+  test-macos:
+    runs-on: macos-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        version: [latest, 2023.8.1]
+        
+    steps:
+      - name: Setup cloudflared using setup-cloudflared
+        uses: AnimMouse/setup-cloudflared@main
+        with:
+          cloudflare_tunnel_credential: ${{ secrets.CLOUDFLARE_TUNNEL_CREDENTIAL }}
+          cloudflare_tunnel_configuration: ${{ secrets.CLOUDFLARE_TUNNEL_CONFIGURATION_MACOS }}
+          cloudflare_tunnel_id: ${{ secrets.CLOUDFLARE_TUNNEL_ID }}
+          
+      - name: Test cloudflared installed by setup-cloudflared using Python HTTP server for 1 minute
+        run: |
+          function timeout(){ perl -e 'alarm shift; exec @ARGV' "$@"; }
+          timeout 60 python3 -m http.server 8080 || true
+          
+      - name: Shutdown cloudflared using setup-cloudflared/shutdown
+        if: always()
+        uses: AnimMouse/setup-cloudflared/shutdown@main
+        
+  test-windows:
+    runs-on: windows-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        version: [latest, 2023.8.1]
+        
+    steps:
+      - name: Setup cloudflared using setup-cloudflared
+        uses: AnimMouse/setup-cloudflared@main
+        with:
+          cloudflare_tunnel_credential: ${{ secrets.CLOUDFLARE_TUNNEL_CREDENTIAL }}
+          cloudflare_tunnel_configuration: ${{ secrets.CLOUDFLARE_TUNNEL_CONFIGURATION_WINDOWS }}
+          cloudflare_tunnel_id: ${{ secrets.CLOUDFLARE_TUNNEL_ID }}
+          
+      - name: Test cloudflared installed by setup-cloudflared using Python HTTP server for 1 minute
+        run: |
+          $http_server = Start-Process "python" "-m http.server 8080" -PassThru
+          Wait-Process $http_server.Id -Timeout 60 -ErrorAction Ignore
+          Stop-Process $http_server.Id
+          Wait-Process $http_server.Id
+          
       - name: Shutdown cloudflared using setup-cloudflared/shutdown
         if: always()
         uses: AnimMouse/setup-cloudflared/shutdown@main

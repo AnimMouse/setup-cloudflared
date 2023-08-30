@@ -88,3 +88,8 @@ runs:
       if: (runner.os == 'Linux' || runner.os == 'macOS') && inputs.autostart != 'false'
       shell: bash
       run: $GITHUB_ACTION_PATH/scripts/autostart/Unix-like.sh
+      
+    - name: Start Cloudflare Tunnel in the background on Windows
+      if: runner.os == 'Windows' && inputs.autostart != 'false'
+      shell: pwsh
+      run: '& $env:GITHUB_ACTION_PATH\scripts\autostart\Windows.ps1'
