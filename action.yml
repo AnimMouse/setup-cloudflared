@@ -5,10 +5,10 @@ branding:
   color: orange
 inputs:
   cloudflare_tunnel_credential:
-    description: Cloudflare Tunnel Credential encoded in base64 (deadbeef-1234-4321-abcd-123456789abc.json)
+    description: Cloudflare Tunnel Credential encoded in Base64 (deadbeef-1234-4321-abcd-123456789abc.json)
     required: true
   cloudflare_tunnel_configuration:
-    description: Cloudflare Tunnel Configuration encoded in base64 (config.yaml)
+    description: Cloudflare Tunnel Configuration encoded in Base64 (config.yaml)
     required: true
   cloudflare_tunnel_id:
     description: Cloudflare Tunnel ID (deadbeef-1234-4321-abcd-123456789abc)
@@ -17,29 +17,74 @@ inputs:
     description: Autostart Cloudflare Tunnel in the background
     required: false
     default: true
+  version:
+    description: cloudflared version
+    default: latest
+  token:
+    description: GitHub token to avoid API rate limiting
+    default: ${{ github.token }}
     
 runs:
   using: composite
   steps:
-    - name: Download cloudflared for Linux
+    - name: Get cloudflared version for Unix-like
+      id: version-unix-like
+      if: runner.os == 'Linux' || runner.os == 'macOS'
+      shell: bash
+      run: $GITHUB_ACTION_PATH/scripts/version/Unix-like.sh
+      env:
+        version: ${{ inputs.version }}
+        GITHUB_TOKEN: ${{ inputs.token }}
+        
+    - name: Get cloudflared version for Windows
+      id: version-windows
+      if: runner.os == 'Windows'
+      shell: pwsh
+      run: '& $env:GITHUB_ACTION_PATH\scripts\version\Windows.ps1'
+      env:
+        version: ${{ inputs.version }}
+        GITHUB_TOKEN: ${{ inputs.token }}
+        
+    - name: Download cloudflared for Unix-like
+      if: runner.os == 'Linux' || runner.os == 'macOS'
       shell: bash
       working-directory: ${{ runner.temp }}
-      run: $GITHUB_ACTION_PATH/scripts/download/Linux.sh
-      
+      run: $GITHUB_ACTION_PATH/scripts/download/Unix-like.sh
+      env:
+        version: ${{ steps.version-unix-like.outputs.version }}
+        
+    - name: Download cloudflared for Windows
+      if: runner.os == 'Windows'
+      shell: pwsh
+      working-directory: ${{ runner.temp }}
+      run: '& $env:GITHUB_ACTION_PATH\scripts\download\Windows.ps1'
+      env:
+        version: ${{ steps.version-windows.outputs.version }}
+        
     - name: Install cloudflared on tool cache
       uses: AnimMouse/tool-cache@v1
       with:
         folder_name: cloudflared
         
-    - name: Sign in to Cloudflare Tunnel client
+    - name: Sign in to Cloudflare Tunnel client on Unix-like
+      if: runner.os == 'Linux' || runner.os == 'macOS'
       shell: bash
+      run: $GITHUB_ACTION_PATH/scripts/sign-in/Unix-like.sh
       env:
         cloudflare_tunnel_credential: ${{ inputs.cloudflare_tunnel_credential }}
         cloudflare_tunnel_configuration: ${{ inputs.cloudflare_tunnel_configuration }}
         cloudflare_tunnel_id: ${{ inputs.cloudflare_tunnel_id }}
-      run: $GITHUB_ACTION_PATH/scripts/sign-in/Unix-like.sh
-      
-    - name: Start Cloudflare Tunnel in the background
-      if: inputs.autostart != 'false'
+        
+    - name: Sign in to Cloudflare Tunnel client on Windows
+      if: runner.os == 'Windows'
+      shell: pwsh
+      run: '& $env:GITHUB_ACTION_PATH\scripts\sign-in\Windows.ps1'
+      env:
+        cloudflare_tunnel_credential: ${{ inputs.cloudflare_tunnel_credential }}
+        cloudflare_tunnel_configuration: ${{ inputs.cloudflare_tunnel_configuration }}
+        cloudflare_tunnel_id: ${{ inputs.cloudflare_tunnel_id }}
+        
+    - name: Start Cloudflare Tunnel in the background on Unix-like
+      if: (runner.os == 'Linux' || runner.os == 'macOS') && inputs.autostart != 'false'
       shell: bash
-      run: $GITHUB_ACTION_PATH/scripts/autostart/Linux.sh
+      run: $GITHUB_ACTION_PATH/scripts/autostart/Unix-like.sh
