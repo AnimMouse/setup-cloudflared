@@ -26,7 +26,7 @@ runs:
       shell: pwsh
       working-directory: ${{ runner.temp }}
       run: |
-        Stop-Process $(Get-Content cloudflared.pid)
+        (Get-Process -Id $(Get-Content cloudflared.pid)).CloseMainWindow()
         Wait-Process -Id $(Get-Content cloudflared.pid)
         
     - name: View logs of cloudflared for Windows

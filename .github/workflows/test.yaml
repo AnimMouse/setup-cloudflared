@@ -79,7 +79,7 @@ jobs:
         run: |
           $http_server = Start-Process "python" "-m http.server 8080" -PassThru
           Wait-Process $http_server.Id -Timeout 60 -ErrorAction Ignore
-          Stop-Process $http_server.Id
+          $http_server.CloseMainWindow()
           Wait-Process $http_server.Id
           
       - name: Shutdown cloudflared using setup-cloudflared/shutdown
