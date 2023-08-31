@@ -14,8 +14,7 @@ inputs:
     description: Cloudflare Tunnel ID (deadbeef-1234-4321-abcd-123456789abc)
     required: true
   autostart:
-    description: Autostart Cloudflare Tunnel in the background
-    required: false
+    description: Autostart cloudflared in the background
     default: true
   version:
     description: cloudflared version
