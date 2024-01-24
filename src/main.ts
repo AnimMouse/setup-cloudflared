@@ -18,13 +18,13 @@ const versionRaw = core.getInput("cloudflared-version");
 let version = versionRaw;
 if (version === "latest") {
   const { data } = await octokit.rest.repos.getLatestRelease({
-    owner: "bytecodealliance",
+    owner: "cloudflare",
     repo: "cloudflared",
   });
   version = data.tag_name;
 } else {
   const releases = await octokit.paginate(octokit.rest.repos.listReleases, {
-    owner: "bytecodealliance",
+    owner: "cloudflare",
     repo: "cloudflared",
   });
   const versions = releases.map((release) =>
