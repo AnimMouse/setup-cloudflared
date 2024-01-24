@@ -1,4 +1,4 @@
-name: Test action
+name: Test start & stop
 on:
   push:
     branches: "main"
