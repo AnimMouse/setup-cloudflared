@@ -31,4 +31,7 @@ jobs:
       - run: npm run build
       - uses: ./
       - uses: ./start
+        with:
+          run: npx -y serve
+          url: http://localhost:3000
       - uses: ./stop

@@ -1,5 +1,22 @@
+inputs:
+  url:
+    required: true
+
 runs:
   using: composite
   steps:
     - shell: bash
-      run: nohup cloudflared --pidfile "$RUNNER_TEMP/cloudflared.pid" --logfile "$RUNNER_TEMP/cloudflared.log" tunnel run &
+      run: |
+        nohup cloudflared \
+          --pidfile "$RUNNER_TEMP/cloudflared.pid" \
+          --logfile "$RUNNER_TEMP/cloudflared.log" \
+          tunnel --url "$INPUT_URL" &
+      env:
+        INPUT_URL: ${{ inputs.url }}
+    - if: inputs.run
+      shell: bash
+      run: |
+        bash -ec "$INPUT_RUN" > "$RUNNER_TEMP/cloudflared-start.log" 2>&1 &
+        echo $! > "$RUNNER_TEMP/cloudflare-start.pid"
+      env:
+        INPUT_RUN: ${{ inputs.run }}
