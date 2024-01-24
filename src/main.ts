@@ -51,7 +51,7 @@ if (!found) {
   const file = `cloudflared-${target}${exeExt}`;
 
   found = await tc.downloadTool(
-    `https://github.com/bytecodealliance/cloudflared/releases/download/${version}/${file}`,
+    `https://github.com/cloudflare/cloudflared/releases/download/${version}/${file}`,
   );
   console.log(found)
   found = await tc.cacheDir(dirname(found), "cloudflared", version);
