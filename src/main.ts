@@ -1,10 +1,12 @@
 #!/usr/bin/env node
 import * as core from "@actions/core";
 import * as tc from "@actions/tool-cache";
-import { dirname } from "node:path";
+import { join } from "node:path";
 import * as semver from "semver";
 import * as github from "@actions/github";
 import { createUnauthenticatedAuth } from "@octokit/auth-unauthenticated";
+import { temporaryDirectory } from "tempy";
+import { rename } from "node:fs/promises";
 
 const token = core.getInput("cloudflared-token");
 const octokit = token
@@ -53,8 +55,10 @@ if (!found) {
   found = await tc.downloadTool(
     `https://github.com/cloudflare/cloudflared/releases/download/${version}/${file}`,
   );
-  console.log(found)
-  found = await tc.cacheDir(dirname(found), "cloudflared", version);
+  const tempDir = temporaryDirectory()
+  await rename(found, join(tempDir, "cloudflared"))
+  found = tempDir
+  found = await tc.cacheDir(found, "cloudflared", version);
   core.info(`cloudflared v${version} added to cache`);
 }
 core.addPath(found);
