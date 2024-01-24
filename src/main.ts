@@ -6,7 +6,7 @@ import * as semver from "semver";
 import * as github from "@actions/github";
 import { createUnauthenticatedAuth } from "@octokit/auth-unauthenticated";
 import { temporaryDirectory } from "tempy";
-import { rename } from "node:fs/promises";
+import { chmod, copyFile, mkdir, rename } from "node:fs/promises";
 
 const token = core.getInput("cloudflared-token");
 const octokit = token
@@ -29,9 +29,7 @@ if (version === "latest") {
     owner: "cloudflare",
     repo: "cloudflared",
   });
-  const versions = releases.map((release) =>
-    release.tag_name,
-  );
+  const versions = releases.map((release) => release.tag_name);
   version = semver.maxSatisfying(versions, version)!;
 }
 core.debug(`Resolved version: v${version}`);
@@ -55,9 +53,10 @@ if (!found) {
   found = await tc.downloadTool(
     `https://github.com/cloudflare/cloudflared/releases/download/${version}/${file}`,
   );
-  const tempDir = temporaryDirectory()
-  await rename(found, join(tempDir, "cloudflared"))
-  found = tempDir
+  await mkdir(`${found}-folder`);
+  await rename(found, join(`${found}-folder`, "cloudflared"));
+  found = `${found}-folder`;
+  await chmod(join(found, "cloudflared"), 0o775);
   found = await tc.cacheDir(found, "cloudflared", version);
   core.info(`cloudflared v${version} added to cache`);
 }
