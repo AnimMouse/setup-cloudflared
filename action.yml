@@ -7,14 +7,18 @@ branding:
 
 inputs:
   cloudflared-version:
-    description: Specifies which version of the 'cloudflared' binary to install from the GitHub Releases page. Note that this is not your typical 'v1.2.3 'version string; instead Cloudflare uses a 'v2023.1.1' date-based versioning scheme. The default value for this field is 'latest' which will automagically default to the latest GitHub Release.
+    description: Specifies which version of cloudflared to install from the GitHub Releases page. Note that cloudflared uses a date-based versioning scheme. The default value for this field is 'latest' which will automagically default to the latest GitHub Release. This field does support semver ranges like '^2023.0.0'.
     default: latest
+  cloudflared-token:
+    description: The GitHub token to use when fetching the version list from cloudflare/cloudflared. You shouldn't have to touch this. The default is the github.token if you're on github.com or unauthenticated (rate limited) if you're not on github.com.
+    default: ${{ github.server_url == 'https://github.com' && github.token || '' }}
+
+outputs:
+  cloudflared-version:
+    description: The version of cloudflared that was installed. This will be something like '2023.8.8' or similar.
+  cache-hit:
+    description: Whether or not cloudflared was restored from the runner's cache or download anew.
 
 runs:
-  using: composite
-  steps:
-    - shell: bash
-      run: bash "$GITHUB_ACTION_PATH/main.sh"
-      env:
-        GITHUB_TOKEN: ${{ github.token }}
-        INPUT_CLOUDFLARED_VERSION: ${{ inputs.cloudflared-version }}
+  using: node20
+  main: dist/main.js

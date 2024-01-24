@@ -2,28 +2,20 @@ name: Test action
 on:
   push:
     branches: "main"
-    paths-ignore:
-      - .gitignore
-      - README.md
-      - LICENSE
-      - .github/**
-      - "!.github/workflows/test-action.yml"
+    paths:
       - start/**
       - stop/**
+      - .github/workflows/test-start-stop.yml
   pull_request:
-    paths-ignore:
-      - .gitignore
-      - README.md
-      - LICENSE
-      - .github/**
-      - "!.github/workflows/test-action.yml"
+    paths:
       - start/**
       - stop/**
+      - .github/workflows/test-start-stop.yml
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 jobs:
-  test-action:
+  test-start-stop:
     strategy:
       fail-fast: false
       matrix:
@@ -38,4 +30,5 @@ jobs:
       - run: npm ci
       - run: npm run build
       - uses: ./
-      - run: cloudflared --version
+      - uses: ./start
+      - uses: ./stop
