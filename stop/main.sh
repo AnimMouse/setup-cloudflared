@@ -5,7 +5,8 @@ if [ "$OS" = "Windows_NT" ]; then
     pwsh -c '
         cd "$env:RUNNER_TEMP"
         (Get-Process -Id $(Get-Content cloudflared.pid)).CloseMainWindow()
-        Wait-Process -Id $(Get-Content cloudflared.pid)
+        # Wait-Process -Id $(Get-Content cloudflared.pid)
+        Stop-Process -Id (Get-Content cloudflared.pid) -Force
     '
 else
     kill "$(< "$RUNNER_TEMP/cloudflared.pid")"
