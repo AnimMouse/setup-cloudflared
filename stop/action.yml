@@ -1,0 +1,7 @@
+runs:
+  using: composite
+  steps:
+    - shell: bash
+      run: kill "$(< "$RUNNER_TEMP/cloudflared.pid")"
+    - shell: bash
+      run: cat "$RUNNER_TEMP/cloudflared.log"

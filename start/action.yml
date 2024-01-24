@@ -1,0 +1,5 @@
+runs:
+  using: composite
+  steps:
+    - shell: bash
+      run: nohup cloudflared --pidfile "$RUNNER_TEMP/cloudflared.pid" --logfile "$RUNNER_TEMP/cloudflared.log" tunnel run &
