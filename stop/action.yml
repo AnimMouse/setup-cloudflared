@@ -1,19 +1,5 @@
 runs:
   using: composite
   steps:
-    - if: runner.os == 'Windows'
-      shell: pwsh
-      run: Stop-Process -Id (Get-Content "$env:RUNNER_TEMP\cloudflared.pid") -Force
-    - if: runner.os != 'Windows'
-      shell: bash
-      run: kill "$(< "$RUNNER_TEMP/cloudflared.pid")"
     - shell: bash
-      run: cat "$RUNNER_TEMP/cloudflared.log"
-    - if: runner.os == 'Windows'
-      shell: pwsh
-      run: Stop-Process -Id (Get-Content "$env:RUNNER_TEMP\cloudflared-start.pid") -Force
-    - if: runner.os != 'Windows'
-      shell: bash
-      run: kill "$(< "$RUNNER_TEMP/cloudflared-start.pid")"
-    - shell: bash
-      run: cat "$RUNNER_TEMP/cloudflared-start.log"
+      run: bash "$GITHUB_ACTION_PATH/main.sh"
