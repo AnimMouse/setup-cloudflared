@@ -18,6 +18,6 @@ runs:
       shell: bash
       run: |
         bash -ec "$INPUT_RUN" > "$RUNNER_TEMP/cloudflared-start.log" 2>&1 &
-        echo $! > "$RUNNER_TEMP/cloudflare-start.pid"
+        echo $! > "$RUNNER_TEMP/cloudflared-start.pid"
       env:
         INPUT_RUN: ${{ inputs.run }}
