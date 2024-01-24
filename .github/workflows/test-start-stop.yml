@@ -34,4 +34,6 @@ jobs:
         with:
           run: npx -y serve
           url: http://localhost:3000
+      - shell: bash
+        run: sleep 100
       - uses: ./stop
