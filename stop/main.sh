@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-set -e
+set -ex
 
 if [ "$OS" = "Windows_NT" ]; then
     pwsh -c '

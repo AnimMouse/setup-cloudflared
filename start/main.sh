@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-set -e
+set -ex
 
 if [[ -e "$RUNNER_TEMP/cloudflared.log" ]]; then
     echo "$RUNNER_TEMP/cloudflared.log already exists!" >&2
