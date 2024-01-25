@@ -9,10 +9,14 @@ if [[ -e "$RUNNER_TEMP/cloudflared.pid" ]]; then
     echo "$RUNNER_TEMP/cloudflared.pid already exists!" >&2
     exit 1
 fi
-nohup cloudflared \
-    --pidfile "$RUNNER_TEMP/cloudflared.pid" \
-    --logfile "$RUNNER_TEMP/cloudflared.log" \
-    tunnel --url "$INPUT_URL" &
+if [ "$OS" = "Windows_NT" ]; then
+    pwsh -c 'Start-Process "cloudflared" "--pidfile $env:RUNNER_TEMP/cloudflared.pid --logfile $env:RUNNER_TEMP/cloudflared.log tunnel run"'
+else
+    nohup cloudflared \
+        --pidfile "$RUNNER_TEMP/cloudflared.pid" \
+        --logfile "$RUNNER_TEMP/cloudflared.log" \
+        tunnel --url "$INPUT_URL" &
+fi
 
 if [[ -n $INPUT_RUN ]]; then
     if [[ -e "$RUNNER_TEMP/run.log" ]]; then

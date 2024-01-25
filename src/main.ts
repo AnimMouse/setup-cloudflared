@@ -5,8 +5,7 @@ import { join } from "node:path";
 import * as semver from "semver";
 import * as github from "@actions/github";
 import { createUnauthenticatedAuth } from "@octokit/auth-unauthenticated";
-import { temporaryDirectory } from "tempy";
-import { chmod, copyFile, mkdir, rename } from "node:fs/promises";
+import { chmod, mkdir, rename } from "node:fs/promises";
 
 const token = core.getInput("cloudflared-token");
 const octokit = token
