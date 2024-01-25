@@ -1,5 +1,9 @@
 runs:
   using: composite
   steps:
-    - shell: bash
+    - if: runner.os == 'Windows'
+      shell: bash
+      run: pwsh "$GITHUB_ACTION_PATH/main.ps1"
+    - if: runner.os != 'Windows'
+      shell: bash
       run: bash "$GITHUB_ACTION_PATH/main.sh"

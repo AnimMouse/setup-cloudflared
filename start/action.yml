@@ -6,7 +6,14 @@ inputs:
 runs:
   using: composite
   steps:
-    - shell: bash
+    - if: runner.os == 'Windows'
+      shell: bash
+      run: pwsh "$GITHUB_ACTION_PATH/main.ps1"
+      env:
+        INPUT_URL: ${{ inputs.url }}
+        INPUT_RUN: ${{ inputs.run }}
+    - if: runner.os != 'Windows'
+      shell: bash
       run: bash "$GITHUB_ACTION_PATH/main.sh"
       env:
         INPUT_URL: ${{ inputs.url }}
