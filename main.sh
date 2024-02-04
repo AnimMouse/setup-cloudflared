@@ -26,20 +26,23 @@ version=$(node "$GITHUB_ACTION_PATH/semver.mjs" \
   | tail -n1)
 
 case $(uname -m) in
-  x86_64) node_arch="x64";;
-  aarch64) node_arch="arm64";;
+  'x86_64') node_arch="x64";;
+  'aarch64' | 'arm64') node_arch="arm64";;
   *) echo "Unknown arch $(uname -m)"; exit 1;;
 esac
 
 tool_cache_dir="$RUNNER_TOOL_CACHE/cloudflared/$version/$node_arch"
 echo "cache-hit=$(test -d "$tool_cache_dir")" >> "$GITHUB_OUTPUT"
 if [[ ! -d $tool_cache_dir ]]; then
-  case $(uname -sm) in
-    Linux x86_64) target="linux-amd64";;
-    Linux aarch64) target="linux-arm64";;
-    MINGW64_NT-* x86_64) target="windows-amd64";;
-    *) echo "Unknown OS/arch $(uname -sm)"; exit 1;;
-  esac
+  if [ "$OS" = "Windows_NT" ]; then
+    target="windows-amd64"
+  else
+    case $(uname -sm) in
+      'Linux x86_64') target="linux-amd64";;
+      'Linux aarch64') target="linux-arm64";;
+      *) echo "Unknown OS/arch $(uname -sm)"; exit 1;;
+    esac
+  fi
 
   if [ "$OS" = "Windows_NT" ]; then
     exe_ext=".exe"
