@@ -2,15 +2,19 @@ name: Test start & stop
 on:
   push:
     branches: "main"
-    paths:
-      - start/**
-      - stop/**
-      - .github/workflows/test-start-stop.yml
+    paths-ignore:
+      - .gitignore
+      - README.md
+      - LICENSE
+      - .github/**
+      - "!.github/workflows/test-start-stop.yml"
   pull_request:
-    paths:
-      - start/**
-      - stop/**
-      - .github/workflows/test-start-stop.yml
+    paths-ignore:
+      - .gitignore
+      - README.md
+      - LICENSE
+      - .github/**
+      - "!.github/workflows/test-start-stop.yml"
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
