@@ -34,28 +34,40 @@ esac
 tool_cache_dir="$RUNNER_TOOL_CACHE/cloudflared/$version/$node_arch"
 echo "cache-hit=$(test -d "$tool_cache_dir")" >> "$GITHUB_OUTPUT"
 if [[ ! -d $tool_cache_dir ]]; then
-  if [ "$OS" = "Windows_NT" ]; then
-    target="windows-amd64"
+  if [[ $(uname -sm) == "Darwin x86_64" ]]; then
+    file=cloudflared-darwin-amd64.tgz
+
+    url="https://github.com/cloudflare/cloudflared/releases/download/$version/$file"
+    echo "Fetching $file v$version from $url"
+    curl -fsSLO "$url"
+    tar -xzvf "$file"
+    chmod +x cloudflared
+    mkdir -p "$tool_cache_dir"
+    mv cloudflared "$tool_cache_dir/cloudflared"
   else
-    case $(uname -sm) in
-      'Linux x86_64') target="linux-amd64";;
-      'Linux aarch64' | 'Linux arm64') target="linux-arm64";;
-      *) echo "Unknown OS/arch $(uname -sm)"; exit 1;;
-    esac
+    if [ "$OS" = "Windows_NT" ]; then
+      target="windows-amd64"
+    else
+      case $(uname -sm) in
+        'Linux x86_64') target="linux-amd64";;
+        'Linux aarch64' | 'Linux arm64') target="linux-arm64";;
+        *) echo "Unknown OS/arch $(uname -sm)"; exit 1;;
+      esac
+    fi
+
+    if [ "$OS" = "Windows_NT" ]; then
+      exe_ext=".exe"
+    fi
+
+    file="cloudflared-$target$exe_ext"
+
+    url="https://github.com/cloudflare/cloudflared/releases/download/$version/$file"
+    echo "Fetching $file v$version from $url"
+    curl -fsSLO "$url"
+    chmod +x "$file"
+    mkdir -p "$tool_cache_dir"
+    mv "$file" "$tool_cache_dir/cloudflared$exe_ext"
   fi
-
-  if [ "$OS" = "Windows_NT" ]; then
-    exe_ext=".exe"
-  fi
-
-  file="cloudflared-$target$exe_ext"
-
-  url="https://github.com/cloudflare/cloudflared/releases/download/$version/$file"
-  echo "Fetching $file v$version from $url"
-  curl -fsSLO "$url"
-  chmod +x "$file"
-  mkdir -p "$tool_cache_dir"
-  mv "$file" "$tool_cache_dir/cloudflared$exe_ext"
 fi
 
 echo "$tool_cache_dir" >> "$GITHUB_PATH"
