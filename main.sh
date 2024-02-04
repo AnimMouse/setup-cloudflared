@@ -52,7 +52,7 @@ if [[ ! -d $tool_cache_dir ]]; then
 
   url="https://github.com/cloudflare/cloudflared/releases/download/$version/$file"
   echo "Fetching $file v$version from $url"
-  wget "$url"
+  wget --no-verbose "$url"
   chmod +x "$file"
   mkdir -p "$tool_cache_dir"
   mv "$file" "$tool_cache_dir/cloudflared$exe_ext"
