@@ -21,7 +21,7 @@ else
   range=$INPUT_CLOUDFLARED_VERSION
 fi
 
-version=$(node "$GITHUB_ACTION_PATH/semver.js" \
+version=$(node "$GITHUB_ACTION_PATH/semver.mjs" \
   --range "$range" $versions \
   | tail -n1)
 
