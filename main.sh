@@ -54,7 +54,7 @@ if [[ ! -d $tool_cache_dir ]]; then
   echo "Fetching $file v$version from $url"
   wget "$url"
   chmod +x "$file"
-  mkdir "$tool_cache_dir"
+  mkdir -p "$tool_cache_dir"
   mv "$file" "$tool_cache_dir/cloudflared$exe_ext"
 fi
 
