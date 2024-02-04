@@ -15,6 +15,12 @@ versions=$(gh release list \
   --limit 1000 \
   | cut -f1)
 
+if [[ $INPUT_CLOUDFLARED_VERSION == latest ]]; then
+  range="*"
+else
+  range=$INPUT_CLOUDFLARED_VERSION
+fi
+
 version=$(node "$GITHUB_ACTION_PATH/semver.js" \
   --range "$range" $versions \
   | tail -n1)
