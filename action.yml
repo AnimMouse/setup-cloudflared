@@ -16,9 +16,17 @@ inputs:
 outputs:
   cloudflared-version:
     description: The version of cloudflared that was installed. This will be something like '2023.8.8' or similar.
+    value: ${{ steps.main.outputs.couldflared-version }}
   cache-hit:
     description: Whether or not cloudflared was restored from the runner's cache or download anew.
+    value: ${{ steps.main.outputs.cache-hit }}
 
 runs:
-  using: node20
-  main: dist/main.js
+  using: composite
+  steps:
+    - id: main
+      shell: bash
+      run: bash "$GITHUB_ACTION_PATH/main.sh"
+      env:
+        INPUT_CLOUDFLARED_VERSION: ${{ inputs.cloudflared-version }}
+        INPUT_CLOUDFLARED_TOKEN: ${{ inputs.cloudflared-token }}
