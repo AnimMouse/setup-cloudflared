@@ -27,7 +27,7 @@ version=$(node "$GITHUB_ACTION_PATH/semver.mjs" \
 
 case $(uname -m) in
   'x86_64') node_arch="x64";;
-  'aarch64' | 'arm64') node_arch="arm64";;
+ 'aarch64' | 'arm64') node_arch="arm64";;
   *) echo "Unknown arch $(uname -m)"; exit 1;;
 esac
 
@@ -39,7 +39,7 @@ if [[ ! -d $tool_cache_dir ]]; then
   else
     case $(uname -sm) in
       'Linux x86_64') target="linux-amd64";;
-      'Linux aarch64') target="linux-arm64";;
+      'Linux aarch64' | 'Linux arm64') target="linux-arm64";;
       *) echo "Unknown OS/arch $(uname -sm)"; exit 1;;
     esac
   fi
