@@ -54,18 +54,6 @@ just open an Issue! ❤️
 
 This GitHub action is build using Bash.
 
-Ocassionally you may need to regenerate the self-contained `semver.mjs` CLI app. You can use `ncc`, `vite`, or `bun` to bundle it. The point of this is to bundle a semver range parser so that we can support `cloudflared-version: 2023.x` or other similar semver range expressions.
-
-```sh
-cd "$(mktemp)"
-bun init -y
-bun install semver
-bun build node_modules/semver/bin/semver.js --target=node --outfile=semver.mjs
-# semver.mjs is now a self-contained script. Run it like 'node semver.mjs'.
-```
-
-
-
 # Setup cloudflared for GitHub Actions
 
 Setup [Cloudflare Tunnel client](https://github.com/cloudflare/cloudflared) for GitHub Actions.

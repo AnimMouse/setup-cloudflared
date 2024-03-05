@@ -8,23 +8,6 @@ temp_dir="$RUNNER_TEMP/$RANDOM"
 mkdir "$temp_dir"
 pushd "$temp_dir"
 
-versions=$(gh release list \
-  --repo cloudflare/cloudflared \
-  --exclude-drafts \
-  --exclude-pre-releases \
-  --limit 1000 \
-  | cut -f1)
-
-if [[ $INPUT_CLOUDFLARED_VERSION == latest ]]; then
-  range="*"
-else
-  range=$INPUT_CLOUDFLARED_VERSION
-fi
-
-version=$(node "$GITHUB_ACTION_PATH/semver.mjs" \
-  --range "$range" $versions \
-  | tail -n1)
-
 case $(uname -m) in
   'x86_64') node_arch="x64";;
  'aarch64' | 'arm64') node_arch="arm64";;
@@ -37,7 +20,11 @@ if [[ ! -d $tool_cache_dir ]]; then
   if [[ $(uname -sm) == "Darwin x86_64" ]]; then
     file=cloudflared-darwin-amd64.tgz
 
-    url="https://github.com/cloudflare/cloudflared/releases/download/$version/$file"
+    if [[ $INPUT_CLOUDFLARED_VERSION == latest ]]; then
+      url="https://github.com/cloudflare/cloudflared/releases/latest/download/$file"
+    else
+      url="https://github.com/cloudflare/cloudflared/releases/download/$INPUT_CLOUDFLARED_VERSION/$file"
+    fi
     echo "Fetching $file v$version from $url"
     curl -fsSLO "$url"
     tar -xzvf "$file"
@@ -61,7 +48,11 @@ if [[ ! -d $tool_cache_dir ]]; then
 
     file="cloudflared-$target$exe_ext"
 
-    url="https://github.com/cloudflare/cloudflared/releases/download/$version/$file"
+    if [[ $INPUT_CLOUDFLARED_VERSION == latest ]]; then
+      url="https://github.com/cloudflare/cloudflared/releases/latest/download/$file"
+    else
+      url="https://github.com/cloudflare/cloudflared/releases/download/$INPUT_CLOUDFLARED_VERSION/$file"
+    fi
     echo "Fetching $file v$version from $url"
     curl -fsSLO "$url"
     chmod +x "$file"
