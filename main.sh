@@ -14,17 +14,19 @@ case $(uname -m) in
   *) echo "Unknown arch $(uname -m)"; exit 1;;
 esac
 
+if [[ $INPUT_CLOUDFLARED_VERSION == latest ]]; then
+  base_url="https://github.com/cloudflare/cloudflared/releases/latest/download/"
+else
+  base_url="https://github.com/cloudflare/cloudflared/releases/download/$INPUT_CLOUDFLARED_VERSION/"
+fi
+
 tool_cache_dir="$RUNNER_TOOL_CACHE/cloudflared/$version/$node_arch"
 echo "cache-hit=$(test -d "$tool_cache_dir")" >> "$GITHUB_OUTPUT"
 if [[ ! -d $tool_cache_dir ]]; then
   if [[ $(uname -sm) == "Darwin x86_64" ]]; then
     file=cloudflared-darwin-amd64.tgz
 
-    if [[ $INPUT_CLOUDFLARED_VERSION == latest ]]; then
-      url="https://github.com/cloudflare/cloudflared/releases/latest/download/$file"
-    else
-      url="https://github.com/cloudflare/cloudflared/releases/download/$INPUT_CLOUDFLARED_VERSION/$file"
-    fi
+    url="$base_url$file"
     echo "Fetching $file v$version from $url"
     curl -fsSLO "$url"
     tar -xzvf "$file"
@@ -48,11 +50,7 @@ if [[ ! -d $tool_cache_dir ]]; then
 
     file="cloudflared-$target$exe_ext"
 
-    if [[ $INPUT_CLOUDFLARED_VERSION == latest ]]; then
-      url="https://github.com/cloudflare/cloudflared/releases/latest/download/$file"
-    else
-      url="https://github.com/cloudflare/cloudflared/releases/download/$INPUT_CLOUDFLARED_VERSION/$file"
-    fi
+    url="$base_url$file"
     echo "Fetching $file v$version from $url"
     curl -fsSLO "$url"
     chmod +x "$file"
