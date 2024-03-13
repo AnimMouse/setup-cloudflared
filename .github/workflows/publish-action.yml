@@ -1,0 +1,14 @@
+name: publish-action
+on:
+  release:
+    types: released
+concurrency: ${{ github.workflow }}
+jobs:
+  publish-action:
+    permissions:
+      contents: write
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/publish-action@v0.2.2
+        with:
+          source-tag: ${{ github.event.release.tag_name }}
