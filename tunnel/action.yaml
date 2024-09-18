@@ -1,0 +1,49 @@
+name: Setup cloudflared tunnel
+description: Use Cloudflare Tunnel to expose private services to the Internet
+branding:
+  icon: cloud
+  color: orange
+inputs:
+  cloudflare_tunnel_credential:
+    description: Cloudflare Tunnel Credential encoded in Base64 (deadbeef-1234-4321-abcd-123456789abc.json)
+    required: true
+  cloudflare_tunnel_configuration:
+    description: Cloudflare Tunnel Configuration encoded in Base64 (config.yaml)
+    required: true
+  cloudflare_tunnel_id:
+    description: Cloudflare Tunnel ID (deadbeef-1234-4321-abcd-123456789abc)
+    required: true
+  autostart:
+    description: Autostart cloudflared tunnel in the background
+    default: true
+    
+runs:
+  using: composite
+  steps:
+    - name: Sign in to cloudflared on Unix-like
+      if: runner.os == 'Linux' || runner.os == 'macOS'
+      shell: bash
+      run: $GITHUB_ACTION_PATH/tunnel/scripts/sign-in/Unix-like.sh
+      env:
+        cloudflare_tunnel_credential: ${{ inputs.cloudflare_tunnel_credential }}
+        cloudflare_tunnel_configuration: ${{ inputs.cloudflare_tunnel_configuration }}
+        cloudflare_tunnel_id: ${{ inputs.cloudflare_tunnel_id }}
+        
+    - name: Sign in to cloudflared on Windows
+      if: runner.os == 'Windows'
+      shell: pwsh
+      run: '& $env:GITHUB_ACTION_PATH\tunnel\scripts\sign-in\Windows.ps1'
+      env:
+        cloudflare_tunnel_credential: ${{ inputs.cloudflare_tunnel_credential }}
+        cloudflare_tunnel_configuration: ${{ inputs.cloudflare_tunnel_configuration }}
+        cloudflare_tunnel_id: ${{ inputs.cloudflare_tunnel_id }}
+        
+    - name: Start cloudflared tunnel in the background on Unix-like
+      if: (runner.os == 'Linux' || runner.os == 'macOS') && inputs.autostart != 'false'
+      shell: bash
+      run: $GITHUB_ACTION_PATH/scripts/autostart/Unix-like.sh
+      
+    - name: Start cloudflared tunnel in the background on Windows
+      if: runner.os == 'Windows' && inputs.autostart != 'false'
+      shell: pwsh
+      run: '& $env:GITHUB_ACTION_PATH\scripts\autostart\Windows.ps1'
