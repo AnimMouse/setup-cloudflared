@@ -14,14 +14,11 @@ jobs:
       fail-fast: false
       matrix:
         os: [ubuntu-latest, windows-latest, macos-latest]
-        version: [latest, "${{ vars.SPECIFIED_VERSION }}"]
         
     steps:
       - name: Setup cloudflared using setup-cloudflared
         uses: AnimMouse/setup-cloudflared@main
-        with:
-          version: ${{ matrix.version }}
-          
+        
       - name: Setup cloudflared tunnel using setup-cloudflared/tunnel
         uses: AnimMouse/setup-cloudflared/tunnel@main
         with:
@@ -46,7 +43,6 @@ jobs:
           $http_server = Start-Process "python" "-m http.server 8080" -PassThru
           Wait-Process $http_server.Id -Timeout 60 -ErrorAction Ignore
           $http_server.CloseMainWindow()
-          Wait-Process $http_server.Id
           
       - name: Shutdown cloudflared using setup-cloudflared/shutdown
         if: '! cancelled()'
