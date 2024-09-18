@@ -1,0 +1,53 @@
+name: Test setup-cloudflared/tunnel
+on:
+  push:
+    paths:
+      - tunnel/action.yaml
+      - tunnel/scripts/**
+      - shutdown/action.yaml
+      - .github/workflows/test-tunnel.yaml
+      
+jobs:
+  test:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+        version: [latest, "${{ vars.SPECIFIED_VERSION }}"]
+        
+    steps:
+      - name: Setup cloudflared using setup-cloudflared
+        uses: AnimMouse/setup-cloudflared@main
+        with:
+          version: ${{ matrix.version }}
+          
+      - name: Setup cloudflared tunnel using setup-cloudflared/tunnel
+        uses: AnimMouse/setup-cloudflared/tunnel@main
+        with:
+          cloudflare_tunnel_credential: ${{ secrets.CLOUDFLARE_TUNNEL_CREDENTIAL }}
+          cloudflare_tunnel_configuration: ${{ matrix.os == 'macos-latest' && secrets.CLOUDFLARE_TUNNEL_CONFIGURATION_MACOS || matrix.os == 'windows-latest' && secrets.CLOUDFLARE_TUNNEL_CONFIGURATION_WINDOWS || secrets.CLOUDFLARE_TUNNEL_CONFIGURATION_UBUNTU }}
+          cloudflare_tunnel_id: ${{ secrets.CLOUDFLARE_TUNNEL_ID }}
+          
+      - name: Test cloudflared tunnel using Python HTTP server for 1 minute on Unix-like
+        if: runner.os == 'Linux' || runner.os == 'macOS'
+        run: |
+          if [ $RUNNER_OS = macOS ]
+          then
+            function timeout(){ perl -e 'alarm shift; exec @ARGV' "$@"; }
+            timeout 60 python3 -m http.server 8080 || true
+          else
+            timeout 1m python -m http.server 8080 || true
+          fi
+          
+      - name: Test cloudflared tunnel using Python HTTP server for 1 minute on Windows
+        if: runner.os == 'Windows'
+        run: |
+          $http_server = Start-Process "python" "-m http.server 8080" -PassThru
+          Wait-Process $http_server.Id -Timeout 60 -ErrorAction Ignore
+          $http_server.CloseMainWindow()
+          Wait-Process $http_server.Id
+          
+      - name: Shutdown cloudflared using setup-cloudflared/shutdown
+        if: '! cancelled()'
+        uses: AnimMouse/setup-cloudflared/shutdown@main
