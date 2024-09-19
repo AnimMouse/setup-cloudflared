@@ -14,17 +14,25 @@ jobs:
       fail-fast: false
       matrix:
         os: [ubuntu-latest, windows-latest, macos-latest]
+        type: [production, trycloudflare]
         
     steps:
       - name: Setup cloudflared using setup-cloudflared
         uses: AnimMouse/setup-cloudflared@main
         
       - name: Setup cloudflared tunnel using setup-cloudflared/tunnel
+        if: matrix.type == 'production'
         uses: AnimMouse/setup-cloudflared/tunnel@main
         with:
           cloudflare_tunnel_credential: ${{ secrets.CLOUDFLARE_TUNNEL_CREDENTIAL }}
-          cloudflare_tunnel_configuration: ${{ matrix.os == 'macos-latest' && secrets.CLOUDFLARE_TUNNEL_CONFIGURATION_MACOS || matrix.os == 'windows-latest' && secrets.CLOUDFLARE_TUNNEL_CONFIGURATION_WINDOWS || secrets.CLOUDFLARE_TUNNEL_CONFIGURATION_UBUNTU }}
-          cloudflare_tunnel_id: ${{ secrets.CLOUDFLARE_TUNNEL_ID }}
+          cloudflare_tunnel_configuration: ${{ runner.os == 'macOS' && vars.CLOUDFLARE_TUNNEL_CONFIGURATION_MACOS || runner.os == 'Windows' && vars.CLOUDFLARE_TUNNEL_CONFIGURATION_WINDOWS || vars.CLOUDFLARE_TUNNEL_CONFIGURATION_UBUNTU }}
+          cloudflare_tunnel_id: ${{ vars.CLOUDFLARE_TUNNEL_ID }}
+          
+      - name: Setup cloudflared tunnel TryCloudflare using setup-cloudflared/tunnel
+        if: matrix.type == 'trycloudflare'
+        uses: AnimMouse/setup-cloudflared/tunnel@main
+        with:
+          url: http://localhost:8080
           
       - name: Test cloudflared tunnel using Python HTTP server for 1 minute on Unix-like
         if: runner.os == 'Linux' || runner.os == 'macOS'
