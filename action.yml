@@ -40,7 +40,7 @@ runs:
         key: cloudflared-${{ steps.version-unix-like.outputs.version || steps.version-windows.outputs.version }}-${{ runner.os }}
         
     - name: Download cloudflared for Unix-like
-      if: (runner.os == 'Linux' || runner.os == 'macOS') && ! steps.cache.outputs.cache-hit
+      if: (runner.os == 'Linux' || runner.os == 'macOS') && (! steps.cache.outputs.cache-hit || steps.cache.outputs.cache-hit == 'false')
       shell: bash
       working-directory: ${{ runner.temp }}
       run: $GITHUB_ACTION_PATH/scripts/download/Unix-like.sh
@@ -48,7 +48,7 @@ runs:
         version: ${{ steps.version-unix-like.outputs.version }}
         
     - name: Download cloudflared for Windows
-      if: runner.os == 'Windows' && ! steps.cache.outputs.cache-hit
+      if: runner.os == 'Windows' && (! steps.cache.outputs.cache-hit || steps.cache.outputs.cache-hit == 'false')
       shell: pwsh
       working-directory: ${{ runner.temp }}
       run: '& $env:GITHUB_ACTION_PATH\scripts\download\Windows.ps1'
@@ -62,7 +62,7 @@ runs:
         cache_hit: ${{ steps.cache.outputs.cache-hit }}
         
     - name: Save cloudflared cache
-      if: '! steps.cache.outputs.cache-hit'
+      if: "! steps.cache.outputs.cache-hit || steps.cache.outputs.cache-hit == 'false'"
       uses: actions/cache/save@v4
       with:
         path: ${{ runner.tool_cache }}/cloudflared
